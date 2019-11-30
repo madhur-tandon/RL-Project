@@ -23,18 +23,18 @@ WEIGHT_DECAY = 0
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 class Agent():
-    def __init__(self, state_size, action_size, modification, random_seed, fc1_units=400, fc2_units=300):
+    def __init__(self, state_size, action_size, modification, random_seed, fc1_units=400, fc2_units=300, environment='pendulum'):
         self.state_size = state_size
         self.action_size = action_size
         self.seed = random.seed(random_seed)
         self.modification = modification
 
-        self.actor_local = Actor(state_size, action_size, modification, random_seed, fc1_units, fc2_units).to(device)
-        self.actor_target = Actor(state_size, action_size, modification, random_seed, fc1_units, fc2_units).to(device)
+        self.actor_local = Actor(state_size, action_size, modification, random_seed, fc1_units, fc2_units, environment).to(device)
+        self.actor_target = Actor(state_size, action_size, modification, random_seed, fc1_units, fc2_units, environment).to(device)
         self.actor_optimizer = optim.Adam(self.actor_local.parameters(), lr=LR_ACTOR)
 
-        self.critic_local = Critic(state_size, action_size, modification, random_seed, fc1_units, fc2_units).to(device)
-        self.critic_target = Critic(state_size, action_size, modification, random_seed, fc1_units, fc2_units).to(device)
+        self.critic_local = Critic(state_size, action_size, modification, random_seed, fc1_units, fc2_units, environment).to(device)
+        self.critic_target = Critic(state_size, action_size, modification, random_seed, fc1_units, fc2_units, environment).to(device)
         self.critic_optimizer = optim.Adam(self.critic_local.parameters(), lr=LR_CRITIC, weight_decay=WEIGHT_DECAY)
 
         self.noise = OUNoise(action_size, random_seed)
@@ -110,3 +110,9 @@ class Agent():
                    path+'_actor.pth')
         torch.save(self.critic_local.state_dict(),
                    path+'_critic.pth')
+
+    def load(self, actor_file, critic_file):
+        self.actor_local.load_state_dict(torch.load(actor_file))
+        self.critic_local.load_state_dict(torch.load(critic_file))
+        self.actor_target.load_state_dict(torch.load(actor_file))
+        self.critic_target.load_state_dict(torch.load(critic_file))
