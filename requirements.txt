@@ -16,7 +16,7 @@ future==0.18.2
 gast==0.3.2
 grpcio==1.11.0
 gym==0.15.4
-html5lib==0.9999999
+html5lib==0.99999999
 importlib-metadata==0.23
 ipdb==0.12.2
 ipykernel==5.1.3
